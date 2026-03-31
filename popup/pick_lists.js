@@ -41,7 +41,6 @@ async function getCustomLists() {
   const userName = (await browser.storage.sync.get("userName"))["userName"];
 
   const result = await requestAniGraphQL(graphQLRequest(userName));
-  console.log(result);
 
   return result["data"]["MediaListCollection"]["lists"]
     .filter(l => l["isCustomList"] === true)
@@ -63,10 +62,8 @@ async function updateSplitLists() {
 
 window.onload = async () => {
   const customLists = await getCustomLists();
-  console.log(customLists);
 
   const splitLists = (await browser.storage.sync.get("splitLists"))["splitLists"];
-  console.log(splitLists);
 
   const listTemplate = document.querySelector('.list[hidden]');
 

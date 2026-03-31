@@ -58,7 +58,6 @@ async function requestAniGraphQL(graphqlRequest) {
 
 async function fetchMediaListCollection(userName) {
   const result = await requestAniGraphQL(graphQLRequest(userName));
-  console.log(result);
 
   return Object.fromEntries(
     result["data"]["MediaListCollection"]["lists"]
@@ -112,7 +111,6 @@ async function main() {
   // fetch all entries, that would normally be displayed (CURRENT, REPEATING)
   const userName = findUserName();
   const mediaListCollection = await fetchMediaListCollection(userName);
-  console.log(mediaListCollection);
   
   // get the element, that has all the lists
   const listsElem = document.querySelector('.list-previews');
