@@ -3,7 +3,7 @@
   "name": "AniList Splitter",
   "version": "1.0",
   "description": "Always Split Watching, Rewatching and Custom List (configurable) Anime in the AniList Home View.",
-  "homepage_url": "https://timaeaeh.net",
+  "homepage_url": "https://github.com/tim-artoria/anilist-splitter",
 
   "icons": {
     "48": "icons/splitscreen_add_152232_96.svg",
