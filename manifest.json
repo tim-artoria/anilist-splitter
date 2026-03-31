@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "AniList Splitter",
+  "version": "1.0",
+  "description": "Always Split Watching, Rewatching and Custom List (configurable) Anime in the AniList Home View.",
+  "homepage_url": "https://timaeaeh.net",
+
+  "icons": {
+    "48": "icons/splitscreen_add_152232_96.svg",
+    "96": "icons/splitscreen_add_152232_96.svg"
+  },
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "anilist-splitter@timaeaeh.net",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  },
+
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+
+  "action": {
+    "default_icon": "icons/splitscreen_add_152232_96.svg",
+    "default_title": "AniList Splitter",
+    "default_popup": "popup/pick_lists.html"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://anilist.co/home"],
+      "js": ["main.js"]
+    }
+  ]
+}
