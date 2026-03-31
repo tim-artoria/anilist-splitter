@@ -69,7 +69,7 @@ function addList(name, mediaListCollection, listsElem) {
   // clone the first existing list, make the new list the $name list
   // and add it to the element, that has all the lists
   const newWrapper = listsElem.firstElementChild.cloneNode(true);
-  newWrapper.querySelector('.section-header').querySelector('h2').text = `Anime in ${name}`;
+  newWrapper.querySelector('.section-header').querySelector('h2').textContent = `Anime in ${name}`;
   listsElem.insertBefore(newWrapper, listsElem.firstChild);
 
   // empty the cloned list
@@ -88,7 +88,7 @@ async function updateLists(mediaListCollection, listsElem) {
   
   // get the current anime list and make it the new rewatching list
   const rewatchingWrapper = listsElem.firstElementChild;
-  rewatchingWrapper.querySelector('.section-header').querySelector('h2').innerHTML = "Anime in Rewatching";
+  rewatchingWrapper.querySelector('.section-header').querySelector('h2').textContent = "Anime in Rewatching";
 
   if ("Watching" in mediaListCollection) {
     addList("Watching", mediaListCollection, listsElem);
