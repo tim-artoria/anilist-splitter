@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AniList Splitter",
-  "version": "1.0",
+  "version": "1.2",
   "description": "Always Split Watching, Rewatching and Custom List (configurable) Anime in the AniList Home View.",
   "homepage_url": "https://github.com/tim-artoria/anilist-splitter",
 
@@ -32,7 +32,7 @@
 
   "content_scripts": [
     {
-      "matches": ["*://anilist.co/home"],
+      "matches": ["*://anilist.co/*"],
       "js": ["main.js"]
     }
   ]

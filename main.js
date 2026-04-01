@@ -132,4 +132,11 @@ async function main() {
   });
 }
 
-main();
+let previousUrl = '';
+const observer = new MutationObserver(() => {
+  if (location.href === previousUrl) return;
+  previousUrl = location.href;
+  if (location.href !== "https://anilist.co/home") return;
+  main();
+});
+observer.observe(document.body, { childList: true, subtree: true });
