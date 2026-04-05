@@ -2,10 +2,10 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 const graphQLRequest = (userName) => ({
   query: `
-  query ($userName: String, $type: MediaType) {
+  query ($userName: String) {
     MediaListCollection(
       userName: $userName
-      type: $type
+      type: ANIME
       status_in: [CURRENT, REPEATING]
       sort: UPDATED_TIME_DESC
     ) {
@@ -22,27 +22,26 @@ const graphQLRequest = (userName) => ({
   }
   `,
   variables: {
-    userName: userName,
-    type: "ANIME"
+    userName: userName
   }
 });
 
 function findUserName() {
   const userElem = document.getElementsByClassName("user")[0]; // profile icon on the top right of the website
   const userName = userElem.innerHTML.match(/href\=\"\/user\/(.+)\/\"/)[1]; // first group of the matched regexp  
-  browser.storage.sync.set({userName: userName});
+  browser.storage.sync.set({ userName: userName });
   return userName;
 }
 
 async function requestAniGraphQL(graphqlRequest) {
-  const request = new Request("https://anilist.co/graphql", {
+  const request = new Request("https://graphql.anilist.co/", {
     method: "POST",
     body: JSON.stringify(graphqlRequest),
     headers: {
       "Content-Type": "application/json"
     }
   });
-  
+
   try {
     const response = await fetch(request);
     if (!response.ok) {
@@ -50,7 +49,7 @@ async function requestAniGraphQL(graphqlRequest) {
     }
 
     return response.json();
-    
+
   } catch (error) {
     console.error(error.message);
   }
@@ -61,15 +60,17 @@ async function fetchMediaListCollection(userName) {
 
   return Object.fromEntries(
     result["data"]["MediaListCollection"]["lists"]
-    .map(l => [l["name"], l["entries"].map(e => e["media"]["id"])])
+      .map(l => [l["name"], l["entries"].map(e => e["media"]["id"])])
   );
 }
 
-function addList(name, mediaListCollection, listsElem) {  
+function addList(name, mediaListCollection, listsElem) {
   // clone the first existing list, make the new list the $name list
   // and add it to the element, that has all the lists
   const newWrapper = listsElem.firstElementChild.cloneNode(true);
   newWrapper.querySelector('.section-header').querySelector('h2').textContent = `Anime in ${name}`;
+  newWrapper.dataset.animeListName = name;
+
   listsElem.insertBefore(newWrapper, listsElem.firstChild);
 
   // empty the cloned list
@@ -85,33 +86,35 @@ function addList(name, mediaListCollection, listsElem) {
 }
 
 async function updateLists(mediaListCollection, listsElem) {
-  
-  // get the current anime list and make it the new rewatching list
-  const rewatchingWrapper = listsElem.firstElementChild;
-  rewatchingWrapper.querySelector('.section-header').querySelector('h2').textContent = "Anime in Rewatching";
+  let { animeConsumeOrder, animeDisplayOrder } = await browser.storage.sync.get();
 
-  if ("Watching" in mediaListCollection) {
-    addList("Watching", mediaListCollection, listsElem);
+  if (animeConsumeOrder === undefined) {
+    animeConsumeOrder = ["Watching", "Rewatching"];
+    await browser.storage.sync.set({ animeConsumeOrder });
   }
 
-  let splitLists = (await browser.storage.sync.get())["splitLists"];
-
-  if (splitLists === undefined) {
-    splitLists = [];
-    await browser.storage.sync.set({ splitLists });
+  if (animeDisplayOrder === undefined) {
+    animeDisplayOrder = ["Watching", "Rewatching"];
+    await browser.storage.sync.set({ animeDisplayOrder });
   }
 
-  splitLists.filter(name => name in mediaListCollection).forEach(name => addList(name, mediaListCollection, listsElem));
+  animeConsumeOrder.filter(name => name in mediaListCollection).reverse().forEach(name => addList(name, mediaListCollection, listsElem));
 
   Array.from(listsElem.querySelectorAll('*:has(.list-preview:empty)'))
     .forEach(wrapper => wrapper.remove());
+
+  animeDisplayOrder
+    .reverse()
+    .map(name => listsElem.querySelector(`[data-anime-list-name="${name}"]`))
+    .filter(elem => elem !== null)
+    .forEach(elem => listsElem.insertBefore(elem, listsElem.firstElementChild));
 }
 
 async function main() {
   // fetch all entries, that would normally be displayed (CURRENT, REPEATING)
   const userName = findUserName();
   const mediaListCollection = await fetchMediaListCollection(userName);
-  
+
   // get the element, that has all the lists
   const listsElem = document.querySelector('.list-previews');
 

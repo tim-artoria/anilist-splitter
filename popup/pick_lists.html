@@ -4,13 +4,18 @@
 		<title>Anilist Extension</title>
 		<meta charset="utf-8">
 		<script src="pick_lists.js"></script>
+		<link rel="stylesheet" href="pick_lists.css">
 	</head>
 	<body>
-		<div id="lists">
-			<div class="list" hidden>
-				<input id="placeholder" type="checkbox">
-				<label for="placeholder">Placeholder</label><br>
+		<h3>Anime Consume Order:</h3>
+		<div id="anime-consume-order" class="lists">
+			<div class="enabled">
+				<span class="list" id="anime-consume-order-separator">--------------------</span>
 			</div>
 		</div>
+		<h3>Anime Display Order:</h3>
+		<div id="anime-display-order" class="lists">
+		</div>
+		<div class="list" hidden></div>
 	</body>
 </html>

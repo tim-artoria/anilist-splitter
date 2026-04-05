@@ -1,0 +1,16 @@
+body {
+  background: #0b1622;
+  color: #9fadbd;
+  font-family: Roboto;
+}
+
+div.list {
+  background: #151f2e;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px 0px;
+}
+
+div.list:hover {
+  cursor: grab;
+}
