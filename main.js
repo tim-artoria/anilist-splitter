@@ -13,8 +13,17 @@ const graphQLRequest = (userName) => ({
         name
         status
         entries {
+          progress
           media {
             id
+            episodes
+            coverImage {
+              large
+            }
+            nextAiringEpisode {
+              timeUntilAiring
+              episode
+            }
           }
         }
       }
@@ -60,7 +69,10 @@ async function fetchMediaListCollection(userName) {
 
   return Object.fromEntries(
     result["data"]["MediaListCollection"]["lists"]
-      .map(l => [l["name"], l["entries"].map(e => e["media"]["id"])])
+      .map(l => [l["name"], l["entries"].map(e => {
+        e["media"]["progress"] = e["progress"];
+        return e["media"];
+      })])
   );
 }
 
@@ -79,9 +91,59 @@ function addList(name, mediaListCollection, listsElem) {
 
   // move entries to the new list, that belong there
   // this way we keep onclick events and stuff
-  mediaListCollection[name].forEach(id => {
-    const elemToMove = listsElem.querySelector(`a[href^="/anime/${id}/"]`).parentElement;
-    if (elemToMove) newList.appendChild(elemToMove);
+  mediaListCollection[name].forEach(media => {
+    const childElem = listsElem.querySelector(`a[href^="/anime/${media["id"]}/"]`);
+    let elemToMove;
+    if (childElem === null) {
+      elemToMove = listsElem.querySelector('.media-preview-card').cloneNode(true);
+      elemToMove.style.opacity = 0.5;
+
+      const content = elemToMove.querySelector('.content');
+      if (content) content.remove();
+
+      const cover = elemToMove.querySelector('.cover');
+      cover.href = `/anime/${media["id"]}/`;
+      cover.dataset.src = media["coverImage"]["large"];
+      cover.style.backgroundImage = `url("${cover.dataset.src}")`;
+      cover.innerHTML = "";
+
+      const { progress, episodes } = media;
+
+      if (media["nextAiringEpisode"]) {
+        const t = media["nextAiringEpisode"]["timeUntilAiring"];
+        const t_d = Math.floor(t / 86400);
+        const t_h = Math.floor(t / 3600) % 24;
+        const t_m = Math.floor(t / 60) % 60;
+        const nextEp = media["nextAiringEpisode"]["episode"];
+        const isBehind = progress < nextEp - 1;
+
+        const imageText = document.createRange().createContextualFragment(`
+          <div data-v-6dc78144="" class="image-text">
+            <div data-v-2fd80e52="" class="${isBehind ? 'isBehind' : ''}">
+              <div data-v-2fd80e52="" class="countdown"><span>
+  			        Ep ${nextEp}
+  			        ${t_d ? `<span>${t_d}d</span> ` : ''}${t_h ? `<span>${t_h}h</span> ` : ''}${t_m ? `<span>${t_m}m</span>` : ''}</span>
+  			      </div>
+  			      ${isBehind ? '<div data-v-2fd80e52="" class="behind-accent"></div>' : ''}
+  			    </div>
+  			  </div>
+  			`);
+        cover.appendChild(imageText);
+      }
+      
+      const imageOverlay = document.createRange().createContextualFragment(`
+        <div data-v-6dc78144="" class="image-overlay">
+			    <div data-v-2fd80e52="">
+			      <div data-v-2fd80e52="" class="plus-progress">${progress}${episodes ? `/${episodes}` : ''}</div>
+          </div>
+        </div>
+      `)
+      cover.appendChild(imageOverlay);
+    } else {
+      elemToMove = childElem.parentElement;
+    }
+
+    newList.appendChild(elemToMove);
   });
 }
 
