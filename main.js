@@ -107,17 +107,18 @@ function addList(name, mediaListCollection, listsElem) {
       cover.style.backgroundImage = `url("${cover.dataset.src}")`;
       cover.innerHTML = "";
 
-      const { progress, episodes } = media;
+      const progress = Number(media["progress"]);
+      const episodes = Number(media["episodes"]);
 
       if (media["nextAiringEpisode"]) {
         const t = media["nextAiringEpisode"]["timeUntilAiring"];
         const t_d = Math.floor(t / 86400);
         const t_h = Math.floor(t / 3600) % 24;
         const t_m = Math.floor(t / 60) % 60;
-        const nextEp = media["nextAiringEpisode"]["episode"];
+        const nextEp = Number(media["nextAiringEpisode"]["episode"]);
         const isBehind = progress < nextEp - 1;
 
-        const imageText = document.createRange().createContextualFragment(`
+        cover.innerHTML = `
           <div data-v-6dc78144="" class="image-text">
             <div data-v-2fd80e52="" class="${isBehind ? 'isBehind' : ''}">
               <div data-v-2fd80e52="" class="countdown"><span>
@@ -127,18 +128,16 @@ function addList(name, mediaListCollection, listsElem) {
   			      ${isBehind ? '<div data-v-2fd80e52="" class="behind-accent"></div>' : ''}
   			    </div>
   			  </div>
-  			`);
-        cover.appendChild(imageText);
+  			`;
       }
       
-      const imageOverlay = document.createRange().createContextualFragment(`
+      cover.innerHTML += `
         <div data-v-6dc78144="" class="image-overlay">
 			    <div data-v-2fd80e52="">
 			      <div data-v-2fd80e52="" class="plus-progress">${progress}${episodes ? `/${episodes}` : ''}</div>
           </div>
         </div>
-      `)
-      cover.appendChild(imageOverlay);
+      `;
     } else {
       elemToMove = childElem.parentElement;
     }

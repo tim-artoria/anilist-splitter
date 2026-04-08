@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AniList Splitter",
-  "version": "2.0",
+  "version": "2.1",
   "description": "Customize, how AniList splits up entries into list previews on the home page. This is an unofficial project.",
   "homepage_url": "https://github.com/tim-artoria/anilist-splitter",
 
